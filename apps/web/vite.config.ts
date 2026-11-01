@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
-  // 운영의 Caddy와 같이 `/api` 접두사를 떼고 api(3000)로 넘긴다.
-  server: { proxy: { '/api': { target: 'http://localhost:3000', rewrite: (path) => path.replace(/^\/api/, '') } } },
+  // api 라우트가 이미 `/api/...`라서 접두사를 떼지 않고 그대로 api(3000)로 넘긴다(운영 Caddy도 동일).
+  server: { proxy: { '/api': 'http://localhost:3000' } },
   test: { environment: 'jsdom' },
 });

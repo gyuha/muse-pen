@@ -1,8 +1,11 @@
-import type { CreateWorkInput, SettingFields, SettingKind, Setting, Work } from '@muse-pen/shared';
+import type { AppType } from '@muse-pen/api';
+import type { CreateWorkInput, SettingFields, SettingKind } from '@muse-pen/shared';
+import { hc } from 'hono/client';
 
-// api 라우트가 `/api/...`로 시작하고, 프록시(Vite 개발·운영 Caddy)가 바깥 `/api` 접두사를 떼므로 `/api/api`가 된다.
-// api가 AppType을 export하지 않아 Hono RPC(hc) 대신 타입을 맞춘 얇은 fetch 래퍼를 쓴다.
-const BASE = '/api/api';
+// api의 Hono RPC 타입으로 호출한다. 경로는 `/api/...` 한 번만이고, 개발은 Vite 프록시가 운영은 Caddy가 그대로 api로 넘긴다.
+const client = hc<AppType>('/');
+// better-auth가 처리하는 /api/auth/*는 RPC 타입 밖이라 fetch를 직접 쓴다.
+const AUTH = '/api/auth';
 
 export class ApiError extends Error {
   constructor(
@@ -21,17 +24,13 @@ function messageOf(data: unknown, status: number): string {
   return `요청에 실패했습니다 (${status})`;
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    method,
-    credentials: 'same-origin',
-    headers: body === undefined ? undefined : { 'content-type': 'application/json' },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  if (res.status === 204) return undefined as T;
-  const data: unknown = await res.json().catch(() => null);
-  if (!res.ok) throw new ApiError(res.status, messageOf(data, res.status));
-  return data as T;
+async function toError(res: Response): Promise<ApiError> {
+  return new ApiError(res.status, messageOf(await res.json().catch(() => null), res.status));
+}
+
+async function auth(path: string, body: unknown): Promise<void> {
+  const res = await fetch(`${AUTH}${path}`, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  if (!res.ok) throw await toError(res);
 }
 
 export interface Me {
@@ -40,15 +39,40 @@ export interface Me {
   role: string;
 }
 
+// 응답 유니온(검증 실패 400 등)은 res.ok로 성공만 좁힌다.
 export const api = {
-  me: () => request<Me>('GET', '/me'),
-  signIn: (email: string, password: string) => request<unknown>('POST', '/auth/sign-in/email', { email, password }),
+  async me() {
+    const res = await client.api.me.$get();
+    if (!res.ok) throw await toError(res);
+    return res.json();
+  },
+  signIn: (email: string, password: string) => auth('/sign-in/email', { email, password }),
   // 가입은 자동 로그인되지 않는다(api가 autoSignIn을 끈다).
-  signUp: (input: { email: string; password: string; name: string; inviteCode: string }) => request<unknown>('POST', '/auth/sign-up/email', input),
-  signOut: () => request<unknown>('POST', '/auth/sign-out', {}),
-  listWorks: () => request<Work[]>('GET', '/works'),
-  getWork: (workId: string) => request<Work>('GET', `/works/${encodeURIComponent(workId)}`),
-  createWork: (input: CreateWorkInput) => request<Work>('POST', '/works', input),
-  listSettings: (workId: string, kind: SettingKind) => request<Setting[]>('GET', `/works/${encodeURIComponent(workId)}/settings?kind=${kind}`),
-  createSetting: (workId: string, fields: SettingFields) => request<Setting>('POST', `/works/${encodeURIComponent(workId)}/settings`, fields),
+  signUp: (input: { email: string; password: string; name: string; inviteCode: string }) => auth('/sign-up/email', input),
+  signOut: () => auth('/sign-out', {}),
+  async listWorks() {
+    const res = await client.api.works.$get();
+    if (!res.ok) throw await toError(res);
+    return res.json();
+  },
+  async getWork(workId: string) {
+    const res = await client.api.works[':workId'].$get({ param: { workId } });
+    if (!res.ok) throw await toError(res);
+    return res.json();
+  },
+  async createWork(input: CreateWorkInput) {
+    const res = await client.api.works.$post({ json: input });
+    if (!res.ok) throw await toError(res);
+    return res.json();
+  },
+  async listSettings(workId: string, kind: SettingKind) {
+    const res = await client.api.works[':workId'].settings.$get({ param: { workId }, query: { kind } });
+    if (!res.ok) throw await toError(res);
+    return res.json();
+  },
+  async createSetting(workId: string, fields: SettingFields) {
+    const res = await client.api.works[':workId'].settings.$post({ param: { workId }, json: fields });
+    if (!res.ok) throw await toError(res);
+    return res.json();
+  },
 };
