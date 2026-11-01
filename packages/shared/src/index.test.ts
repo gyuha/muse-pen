@@ -77,9 +77,10 @@ describe('컨셉', () => {
     expect(conceptSchema.safeParse(concept).success).toBe(true);
   });
 
-  it('화풍 레퍼런스 이미지는 1~3장이다', () => {
+  it('화풍 레퍼런스 이미지는 0~3장이다(작품 생성 시점엔 이미지가 없다)', () => {
     const withRefs = (ids: string[]) => ({ ...concept, artStylePreset: { prompt: '수채화풍', referenceImageIds: ids } });
-    expect(conceptSchema.safeParse(withRefs([])).success).toBe(false);
+    expect(conceptSchema.safeParse(withRefs([])).success).toBe(true);
+    expect(conceptSchema.safeParse(withRefs(['a'])).success).toBe(true);
     expect(conceptSchema.safeParse(withRefs(['a', 'b', 'c'])).success).toBe(true);
     expect(conceptSchema.safeParse(withRefs(['a', 'b', 'c', 'd'])).success).toBe(false);
   });
