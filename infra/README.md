@@ -17,7 +17,8 @@ docker compose --env-file /tmp/muse-pen.env -f infra/docker-compose.yml config -
 docker compose --env-file /tmp/muse-pen.env -f infra/docker-compose.yml up --build -d
 ```
 
-Caddy serves the built web SPA and strips `/api` before proxying to port 3000.
+Caddy serves the built web SPA and proxies `/api` and `/api/*` unchanged to port
+3000. API routes already include `/api`; browser requests use this prefix once.
 Only Caddy publishes ports. API startup creates the SQLite database and schema.
 The API runs TypeScript with tsx, including workspace packages that export source.
 Do not scale the API beyond one replica.

@@ -3,7 +3,6 @@
 
 	@api path /api /api/*
 	handle @api {
-		uri strip_prefix /api
 		reverse_proxy api:3000 {
 			flush_interval -1
 		}
