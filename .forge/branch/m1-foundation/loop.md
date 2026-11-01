@@ -17,11 +17,11 @@ wall: none
 
 ## Check progress
 - K1: pass · regressed: ×0 · last-evidence: "K1 pass — install·typecheck·build 성공 (task 4 봉인 후)"
-- K2: fail ×1 · regressed: ×0 · last-evidence: "K2 fail — web·api·story-engine·image-engine 테스트 파일 0개 (shared 해소)"
-- K3: fail ×1 · regressed: ×0 · last-evidence: "K3 fail — 리포트 생성됨, AC-01~16 통과 테스트 없음 (tests 미작성, task 8 담당)"
+- K2: fail ×1 · regressed: ×0 · last-evidence: "K2 fail — web·api 테스트 파일 0개 (엔진 2개 해소, task 5 봉인 후)"
+- K3: fail ×2 · regressed: ×0 · last-evidence: "K3 fail — AC-01~16 통과 테스트 없음 (변화 없음 — 담당 멤버 task 8 미실행이라 드라이브 계속)"
 - K4: pass · regressed: ×0 · last-evidence: "K4 pass — drizzle-orm 의존성 있음, 금지 패턴 0건 (주의: 스키마 미작성이라 공허한 통과 — 실제 증명은 K3 AC)"
-- K5: pass · regressed: ×0 · last-evidence: "K5 pass — 추적 파일 85개에 키 형태 0건"
-- K6: fail ×1 · regressed: ×0 · last-evidence: "K6 fail — infra/docker-compose.yml 없음 (task 7 담당)"
+- K5: pass · regressed: ×0 · last-evidence: "K5 pass — 추적 파일 107개에 키 형태 0건"
+- K6: fail ×2 · regressed: ×0 · last-evidence: "K6 fail — infra/docker-compose.yml 없음 (변화 없음 — 담당 멤버 task 7 미실행이라 드라이브 계속)"
 - K7: pass · regressed: ×0 · last-evidence: "K7 pass — docs-check 통과 · 계약 해시 일치"
 
 ## Authorized replan scope
