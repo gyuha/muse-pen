@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "goal": "AI를 이용해서 웹소설을 쓰는 사이트 제작(캐릭터, 배경, 소품 등 이미지 생성도 가능 함)",
+  "orchestrator": {
+    "workspace": "orchestrator",
+    "provider": "claude",
+    "model": "claude-opus-5-5"
+  },
+  "roles": [
+    {
+      "name": "frontend",
+      "workspace": "",
+      "provider": "claude",
+      "model": "claude-sonnet-5-5",
+      "folders": [
+        "apps/web"
+      ],
+      "instructions": "웹소설 집필 사이트의 UI를 만든다. 작품 목록, 회차 에디터, 캐릭터/배경/소품 설정 화면, 이미지 생성 결과 갤러리를 포함한다. API 계약은 backend가 정의한 타입을 따르고, 시각 디자인과 반응형 레이아웃의 일관성을 책임진다."
+    },
+    {
+      "name": "backend",
+      "workspace": "",
+      "provider": "claude",
+      "model": "claude-sonnet-5-5",
+      "folders": [
+        "apps/api",
+        "packages/shared"
+      ],
+      "instructions": "인증, 작품·회차·설정(캐릭터/배경/소품) CRUD, DB 스키마와 마이그레이션, 생성 작업 큐와 이미지 저장소를 구현한다. frontend와 엔진들이 공통으로 쓰는 API 타입과 스키마는 packages/shared에 둔다."
+    },
+    {
+      "name": "story",
+      "workspace": "",
+      "provider": "claude",
+      "model": "claude-sonnet-5-5",
+      "folders": [
+        "packages/story-engine"
+      ],
+      "instructions": "LLM 기반 소설 생성 파이프라인을 만든다. 줄거리 구상, 회차 초안 작성, 이어쓰기, 문체 다듬기를 담당하고, 캐릭터·세계관 설정을 컨텍스트로 주입해 설정 충돌이 생기지 않게 한다. 프롬프트 템플릿과 출력 스키마는 버전으로 관리한다."
+    },
+    {
+      "name": "imagery",
+      "workspace": "",
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "folders": [
+        "packages/image-engine"
+      ],
+      "instructions": "캐릭터, 배경, 소품 설정을 이미지 생성 프롬프트로 바꾸고 이미지 생성 API를 호출하는 엔진을 만든다. 같은 캐릭터가 여러 장면에 나와도 외형이 일관되도록 레퍼런스 시드와 스타일 프리셋을 관리하며, 결과 저장은 backend의 저장소 인터페이스를 사용한다."
+    },
+    {
+      "name": "qa",
+      "workspace": "qa",
+      "provider": "claude",
+      "model": "claude-sonnet-5-5",
+      "folders": [
+        "tests"
+      ],
+      "instructions": "작품 생성부터 회차 작성, 이미지 생성까지 이어지는 핵심 사용자 흐름을 E2E 테스트와 통합 테스트로 작성하고, 각 역할의 결과물을 별도 워크스페이스에서 검증한다. 실패하면 재현 절차를 붙여 orchestrator에 보고한다."
+    },
+    {
+      "name": "deploy",
+      "workspace": "",
+      "provider": "codex",
+      "model": "gpt-6.1-sol",
+      "folders": [
+        "infra",
+        ".github/workflows"
+      ],
+      "instructions": "Owns the build, CI/CD pipelines, container and infrastructure config, and environment variable and secret wiring needed to ship apps/web and apps/api. Takes release requests from the orchestrator, checks that the qa role has passed before any production deploy, and asks the orchestrator before doing anything that cannot be undone, such as a production rollout, rollback or infrastructure teardown."
+    }
+  ]
+}
