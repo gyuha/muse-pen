@@ -1,0 +1,75 @@
+name: muse-pen
+
+services:
+  caddy:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: caddy
+    restart: unless-stopped
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./data/caddy:/data
+      - ./data/caddy-config:/config
+    depends_on:
+      - api
+
+  # SQLite and the in-process worker require exactly one API instance.
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile
+      target: api
+    init: true
+    restart: unless-stopped
+    deploy:
+      replicas: 1
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      DB_PATH: /data/sqlite/muse-pen.db
+      IMAGE_DIR: /data/images
+      BASE_URL: ${BASE_URL:-https://localhost}
+      TRUSTED_ORIGINS: ${TRUSTED_ORIGINS:-https://localhost}
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    volumes:
+      - ./data/sqlite:/data/sqlite
+      - ./data/images:/data/images
+
+  litestream:
+    image: litestream/litestream:0.3.13
+    restart: unless-stopped
+    command: ["replicate", "-config", "/etc/litestream.yml"]
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      S3_REGION: ${S3_REGION:-us-east-1}
+    volumes:
+      - ./litestream.yml:/etc/litestream.yml:ro
+      - ./data/sqlite:/data/sqlite
+    depends_on:
+      - api
+
+  image-backup:
+    image: amazon/aws-cli:2.17.49
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "/scripts/sync-images.sh"]
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_DEFAULT_REGION: ${S3_REGION:-us-east-1}
+      S3_BUCKET: ${S3_BUCKET:-}
+      S3_ENDPOINT: ${S3_ENDPOINT:-}
+      IMAGE_SYNC_INTERVAL: ${IMAGE_SYNC_INTERVAL:-300}
+    volumes:
+      - ./sync-images.sh:/scripts/sync-images.sh:ro
+      - ./data/images:/data/images:ro
