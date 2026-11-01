@@ -18,14 +18,6 @@ const patchSchema = z.strictObject({
   unverified: shape.unverified.optional(), sources: shape.sources.optional(), tags: shape.tags.optional(),
 });
 
-export const resourcesRoutes = new Hono<Env>();
-
-resourcesRoutes.get('/works/:workId/resources', (c) => c.json(svc(c).repo.listResources(ownedWork(c).id)));
-
-resourcesRoutes.post('/works/:workId/resources', validate('json', createSchema), (c) =>
-  c.json(svc(c).repo.createResource(ownedWork(c).id, c.req.valid('json')), 201),
-);
-
 function ownedResource(c: Parameters<typeof ownedWork>[0]) {
   const work = ownedWork(c);
   const resource = svc(c).repo.getResource(work.id, c.req.param('resourceId') ?? '');
@@ -33,15 +25,23 @@ function ownedResource(c: Parameters<typeof ownedWork>[0]) {
   return { work, resource };
 }
 
-resourcesRoutes.get('/works/:workId/resources/:resourceId', (c) => c.json(ownedResource(c).resource));
+export const resourcesRoutes = new Hono<Env>()
 
-resourcesRoutes.patch('/works/:workId/resources/:resourceId', validate('json', patchSchema), (c) => {
+.get('/works/:workId/resources', (c) => c.json(svc(c).repo.listResources(ownedWork(c).id)))
+
+.post('/works/:workId/resources', validate('json', createSchema), (c) =>
+  c.json(svc(c).repo.createResource(ownedWork(c).id, c.req.valid('json')), 201),
+)
+
+.get('/works/:workId/resources/:resourceId', (c) => c.json(ownedResource(c).resource))
+
+.patch('/works/:workId/resources/:resourceId', validate('json', patchSchema), (c) => {
   const { work, resource } = ownedResource(c);
   const { id: _i, workId: _w, createdAt: _c, updatedAt: _u, ...current } = resource;
   return c.json(svc(c).repo.updateResource(work.id, resource.id, { ...current, ...c.req.valid('json') }));
-});
+})
 
-resourcesRoutes.delete('/works/:workId/resources/:resourceId', (c) => {
+.delete('/works/:workId/resources/:resourceId', (c) => {
   svc(c).repo.deleteResource(ownedResource(c).resource.id);
   return c.body(null, 204);
 });

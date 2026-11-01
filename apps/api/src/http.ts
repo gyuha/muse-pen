@@ -26,7 +26,8 @@ export const notFound = () => new HttpError(404, 'not found');
 // 스키마는 맞지만 의미가 틀린 입력(다른 작품의 캐릭터를 소품 소유자로 지정 등)
 export const unprocessable = (message: string) => new HttpError(422, message);
 
-export const validate = <T extends ZodType>(target: 'json' | 'query', schema: T) =>
+// target을 리터럴 타입으로 유지해야 Hono RPC 클라이언트의 입력 타입(json/query)이 정확하다.
+export const validate = <Target extends 'json' | 'query', T extends ZodType>(target: Target, schema: T) =>
   zValidator(target, schema, (result, c) => {
     if (!result.success) return c.json({ error: 'validation', issues: result.error.issues }, 400);
   });

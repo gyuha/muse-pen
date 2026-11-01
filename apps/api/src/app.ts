@@ -10,14 +10,8 @@ import { HttpError, type Env } from './http';
 import { createJobHandlers } from './jobs';
 import { DEFAULT_PRICING, estimateCost, type PricingTable } from './pricing';
 import { Repository } from './repository';
-import { adminRoutes, newInviteCode } from './routes/admin';
-import { aiRoutes } from './routes/ai';
-import { episodesRoutes } from './routes/episodes';
-import { imagesRoutes } from './routes/images';
-import { jobsRoutes } from './routes/jobs';
-import { resourcesRoutes } from './routes/resources';
-import { settingsRoutes } from './routes/settings';
-import { worksRoutes } from './routes/works';
+import { newInviteCode } from './routes/admin';
+import { apiRoutes } from './routes';
 import type { Services } from './services';
 import { LocalDiskImageStorage } from './storage';
 import { newId, nowIso } from './util';
@@ -99,20 +93,11 @@ export function createApp(options: CreateAppOptions): ApiApp {
   // 로그인·가입·로그아웃은 better-auth가 처리한다(/api/auth/*).
   app.on(['GET', 'POST'], '/api/auth/*', (c) => auth.handler(c.req.raw));
 
-  const api = new Hono<Env>();
-  api.use('*', async (c, next) => {
-    const session = await auth.api.getSession({ headers: c.req.raw.headers });
-    if (!session) return c.json({ error: 'unauthorized' }, 401);
-    c.set('author', { id: session.user.id, email: session.user.email, role: (session.user as { role?: string }).role ?? 'user' });
+  app.use('/api/*', async (c, next) => {
     c.set('services', services);
     await next();
   });
-  api.get('/me', (c) => c.json(c.get('author')));
-  api.get('/usage', (c) => c.json(repo.listUsage(c.get('author').id)));
-  for (const routes of [worksRoutes, episodesRoutes, settingsRoutes, resourcesRoutes, aiRoutes, jobsRoutes, imagesRoutes, adminRoutes]) {
-    api.route('/', routes);
-  }
-  app.route('/api', api);
+  app.route('/api', apiRoutes);
 
   if (options.startWorker !== false) worker.start();
 

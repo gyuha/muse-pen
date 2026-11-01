@@ -17,7 +17,6 @@ const aiBodySchema = z.strictObject({
 });
 type AiBody = z.infer<typeof aiBodySchema>;
 
-export const aiRoutes = new Hono<Env>();
 
 // 호출 1회마다 AI 사용 기록 1건. 작가 ID와 추정 비용은 여기서 붙인다.
 function engineDeps(c: Ctx): EngineDeps {
@@ -40,26 +39,27 @@ const STREAM_TASKS: Record<string, (deps: EngineDeps, input: ReturnType<typeof b
   draft: (d, i) => draftEpisode(d, i),
 };
 
-const base = '/works/:workId/episodes/:episodeId/ai';
+const base = '/works/:workId/episodes/:episodeId/ai'
 
+export const aiRoutes = new Hono<Env>()
 // ghost text: 한 문장 이내 이어쓰기 제안(하위 모델). 수락은 작가가 Tab으로 한다.
-aiRoutes.post(`${base}/ghost`, validate('json', aiBodySchema), async (c) => {
+.post(`${base}/ghost`, validate('json', aiBodySchema), async (c) => {
   const { work, episode } = ownedEpisode(c);
   const body = c.req.valid('json');
   const input = buildContextInput(svc(c).repo, work, episode, body.currentText);
   return c.json(await ghostText(engineDeps(c), input, need(body.textBefore, 'textBefore')));
-});
+})
 
 // 설정 점검: 작가가 요청할 때만 LLM을 부른다.
-aiRoutes.post(`${base}/setting-check`, validate('json', aiBodySchema), async (c) => {
+.post(`${base}/setting-check`, validate('json', aiBodySchema), async (c) => {
   const { work, episode } = ownedEpisode(c);
   const input = buildContextInput(svc(c).repo, work, episode, c.req.valid('json').currentText);
   return c.json(await checkSettings(engineDeps(c), input));
-});
+})
 
 // 대화형 텍스트: 요청 안에서 SSE로 흘려보낸다. 이벤트: token* → suggestion → done (실패 시 error).
 // 결과는 AI 제안으로만 돌려주고 본문에는 반영하지 않는다. 수락은 작가가 회차 수정 요청으로 한다.
-aiRoutes.post(`${base}/:task{continue|rewrite|polish|expand|shrink|draft}`, validate('json', aiBodySchema), (c) => {
+.post(`${base}/:task{continue|rewrite|polish|expand|shrink|draft}`, validate('json', aiBodySchema), (c) => {
   const { work, episode } = ownedEpisode(c);
   const body = c.req.valid('json');
   const input = buildContextInput(svc(c).repo, work, episode, body.currentText);
@@ -73,10 +73,10 @@ aiRoutes.post(`${base}/:task{continue|rewrite|polish|expand|shrink|draft}`, vali
       await sse.writeSSE({ event: 'error', data: JSON.stringify({ message: error instanceof Error ? error.message : String(error) }) });
     }
   });
-});
+})
 
 // 자료 조사: 결과는 미검증 초안이다. 저장은 작가가 자료 생성 요청으로 한다.
-aiRoutes.post('/works/:workId/research', validate('json', z.strictObject({ question: z.string().min(1) })), async (c) => {
+.post('/works/:workId/research', validate('json', z.strictObject({ question: z.string().min(1) })), async (c) => {
   ownedWork(c);
   const s = svc(c);
   const authorId = me(c).id;

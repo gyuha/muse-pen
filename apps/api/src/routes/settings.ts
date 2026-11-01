@@ -3,7 +3,6 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { type Ctx, type Env, HttpError, notFound, ownedSetting, ownedWork, svc, unprocessable, validate } from '../http';
 
-export const settingsRoutes = new Hono<Env>();
 
 const querySchema = z.object({ kind: settingKindSchema.optional() });
 const looseBody = z.record(z.string(), z.unknown());
@@ -36,23 +35,24 @@ export function checkReferences(c: Ctx, workId: Id, fields: SettingFields, setti
   }
 }
 
-settingsRoutes.get('/works/:workId/settings', validate('query', querySchema), (c) =>
+export const settingsRoutes = new Hono<Env>()
+.get('/works/:workId/settings', validate('query', querySchema), (c) =>
   c.json(svc(c).repo.listSettings(ownedWork(c).id, c.req.valid('query').kind)),
-);
+)
 
 // 요청 본문 = 정형 필드(kind 포함) + 선택적 bodyJson(설정 본문 블록 JSON)
-settingsRoutes.post('/works/:workId/settings', validate('json', looseBody), (c) => {
+.post('/works/:workId/settings', validate('json', looseBody), (c) => {
   const work = ownedWork(c);
   const { bodyJson, ...raw } = c.req.valid('json');
   const fields = parseFields(raw);
   checkReferences(c, work.id, fields, null);
   const { repo, deriver } = svc(c);
   return c.json(repo.createSetting(work.id, fields, { ...deriver.derive(bodyJson), bodyJson: bodyJson ?? null }), 201);
-});
+})
 
-settingsRoutes.get('/works/:workId/settings/:settingId', (c) => c.json(ownedSetting(c).setting));
+.get('/works/:workId/settings/:settingId', (c) => c.json(ownedSetting(c).setting))
 
-settingsRoutes.patch('/works/:workId/settings/:settingId', validate('json', looseBody), (c) => {
+.patch('/works/:workId/settings/:settingId', validate('json', looseBody), (c) => {
   const { work, setting } = ownedSetting(c);
   const { bodyJson, ...patch } = c.req.valid('json');
   if ('kind' in patch && patch.kind !== setting.kind) throw new HttpError(400, '설정 종류는 바꿀 수 없다');
@@ -61,25 +61,25 @@ settingsRoutes.patch('/works/:workId/settings/:settingId', validate('json', loos
   const { repo, deriver } = svc(c);
   const body = 'bodyJson' in c.req.valid('json') ? { ...deriver.derive(bodyJson), bodyJson: bodyJson ?? null } : undefined;
   return c.json(repo.updateSetting(work.id, setting.id, { fields, body }));
-});
+})
 
-settingsRoutes.delete('/works/:workId/settings/:settingId', async (c) => {
+.delete('/works/:workId/settings/:settingId', async (c) => {
   const { work, setting } = ownedSetting(c);
   const { repo, storage } = svc(c);
   const keys = repo.deleteSetting(work.id, setting.id);
   await Promise.all(keys.map((k) => storage.delete(k).catch(() => undefined)));
   return c.body(null, 204);
-});
+})
 
 // --- 필드 변경 제안(회차 완료 처리 결과). 수락한 것만 정형 필드에 반영된다. ---
-settingsRoutes.get('/works/:workId/episodes/:episodeId/field-changes', (c) => {
+.get('/works/:workId/episodes/:episodeId/field-changes', (c) => {
   const work = ownedWork(c);
   const episode = svc(c).repo.getEpisode(work.id, c.req.param('episodeId'));
   if (!episode) throw notFound();
   return c.json(svc(c).repo.listFieldChanges(work.id, episode.id));
-});
+})
 
-settingsRoutes.post('/works/:workId/field-changes/:changeId/:action{accept|reject}', (c) => {
+.post('/works/:workId/field-changes/:changeId/:action{accept|reject}', (c) => {
   const work = ownedWork(c);
   const { repo } = svc(c);
   const change = repo.getFieldChange(work.id, c.req.param('changeId'));

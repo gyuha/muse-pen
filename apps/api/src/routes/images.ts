@@ -10,7 +10,6 @@ const IMAGE_FILES = '/api/image-files/';
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const UPLOAD_MODEL_ID = 'user-upload';
 
-export const imagesRoutes = new Hono<Env>();
 
 async function withUrl(c: Ctx, image: ImageRecord) {
   return { ...image, url: await svc(c).storage.getAccessUrl(image.storageKey) };
@@ -22,32 +21,33 @@ function ownedImage(c: Ctx, image: ImageRecord | null): ImageRecord {
   return image;
 }
 
-imagesRoutes.get('/works/:workId/settings/:settingId/images', async (c) => {
+export const imagesRoutes = new Hono<Env>()
+.get('/works/:workId/settings/:settingId/images', async (c) => {
   const { work, setting } = ownedSetting(c);
   const images = svc(c).repo.listImages(work.id, { targetType: 'setting', targetId: setting.id });
   return c.json(await Promise.all(images.map((i) => withUrl(c, i))));
-});
+})
 
-imagesRoutes.get('/images/:imageId', async (c) => c.json(await withUrl(c, ownedImage(c, svc(c).repo.getImage(c.req.param('imageId'))))));
+.get('/images/:imageId', async (c) => c.json(await withUrl(c, ownedImage(c, svc(c).repo.getImage(c.req.param('imageId'))))))
 
 // 권한을 확인한 뒤에만 파일을 내려준다(정적 경로로 공개하지 않는다).
-imagesRoutes.get('/image-files/*', async (c) => {
+.get('/image-files/*', async (c) => {
   const key = decodeURIComponent(c.req.path.slice(IMAGE_FILES.length));
   const image = ownedImage(c, svc(c).repo.getImageByKey(key));
   const { data, contentType } = await svc(c).storage.read(image.storageKey);
   return new Response(Buffer.from(data), { headers: { 'content-type': contentType, 'cache-control': 'private, max-age=0' } });
-});
+})
 
 // 작가가 승인한 이미지가 그 설정의 대표 이미지가 된다. 이후 모든 생성의 참조 입력이다.
-imagesRoutes.post('/images/:imageId/approve', (c) => {
+.post('/images/:imageId/approve', (c) => {
   const image = ownedImage(c, svc(c).repo.getImage(c.req.param('imageId')));
   const { repo } = svc(c);
   const setting = image.targetType === 'setting' ? repo.getSetting(image.workId, image.targetId) : null;
   if (!setting) throw unprocessable('설정 이미지만 승인할 수 있다');
   return c.json(repo.approveImage(setting, image));
-});
+})
 
-imagesRoutes.delete('/images/:imageId', async (c) => {
+.delete('/images/:imageId', async (c) => {
   const image = ownedImage(c, svc(c).repo.getImage(c.req.param('imageId')));
   const { repo, storage } = svc(c);
   repo.transaction((tx) => {
@@ -65,10 +65,10 @@ imagesRoutes.delete('/images/:imageId', async (c) => {
   });
   await storage.delete(image.storageKey).catch(() => undefined);
   return c.body(null, 204);
-});
+})
 
 // 화풍 레퍼런스 이미지 올리기(최대 3장). 올리면 작품의 화풍 프리셋 레퍼런스에 바로 추가된다.
-imagesRoutes.post('/works/:workId/art-style-references', async (c) => {
+.post('/works/:workId/art-style-references', async (c) => {
   const work = ownedWork(c);
   const { repo, storage } = svc(c);
   const contentType = c.req.header('content-type') ?? '';
