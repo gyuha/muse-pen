@@ -5,10 +5,13 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "test:accept": "vitest run --reporter=json --outputFile=.reports/vitest.json --passWithNoTests && playwright test --pass-with-no-tests"
+    "test:accept": "rm -rf .reports && vitest run --reporter=json --outputFile=.reports/vitest.json --passWithNoTests; v=$?; playwright test --pass-with-no-tests; p=$?; [ $v -eq 0 ] && [ $p -eq 0 ]"
   },
   "devDependencies": {
+    "@muse-pen/api": "workspace:*",
+    "@muse-pen/image-engine": "workspace:*",
     "@muse-pen/shared": "workspace:*",
+    "@muse-pen/story-engine": "workspace:*",
     "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.6",
     "typescript": "^7.0.2",

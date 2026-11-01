@@ -175,9 +175,18 @@ importers:
 
   tests:
     devDependencies:
+      '@muse-pen/api':
+        specifier: workspace:*
+        version: link:../apps/api
+      '@muse-pen/image-engine':
+        specifier: workspace:*
+        version: link:../packages/image-engine
       '@muse-pen/shared':
         specifier: workspace:*
         version: link:../packages/shared
+      '@muse-pen/story-engine':
+        specifier: workspace:*
+        version: link:../packages/story-engine
       '@playwright/test':
         specifier: ^1.64.1
         version: 1.64.1
