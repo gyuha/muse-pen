@@ -1,0 +1,9 @@
+089456061ca9c8a3e7648fe5c38dbcb26702ec89fbbe95514ea5098470388bad  .forge/agenda.md
+46872c4cbfd6ecf87c57cc37332f1f62386c5ad5ebe879983aa889ce9aa95efc  .forge/CONTEXT.md
+5ff69d1d0cade5ada0f18e0c3018030dbee570ba13af0d4e1c029e46f93c41a6  .forge/adr/261101-223930-setting-structured-fields-plus-free-body.md
+c65960d7b37749297ae5ba4060bc45efb169b0f9bd2b4915c35e2c593a4a4b68  .forge/adr/261101-225940-claude-single-provider-thin-interface.md
+5740b3878621ff103ec446de8aef194d4154b1382c743f81cede149560066308  .forge/adr/261101-230415-typescript-monorepo-web-api-split.md
+144fae3eeffb607fe0a104ab9691328fbd46077af31e6205470292a2ab7bf98d  .forge/adr/261101-231535-drizzle-sqlite-with-portability-rules.md
+d0b7191764a945ba9e786a508b83362ab2eef91359b61779248ead8f184226d0  .forge/adr/261101-232141-single-vps-docker-compose-single-instance.md
+aa4699a05b98b64eaabb40815567b39f9c078d6f08956ad8a79817d25fdc457d  .forge/adr/261101-233441-reference-conditioned-images-gemini.md
+ea357e4675dc75ea6a0420c24468658249596d717bda97d623fcfbd879d2e432  .forge/adr/261101-233610-editor-ime-spike-gate-block-json.md
