@@ -1,0 +1,108 @@
+version: '3'
+
+# 루트에서 실행한다. 각 작업은 package.json 스크립트와 infra/README.md 명령을 그대로 감싼다.
+
+tasks:
+  default:
+    desc: 작업 목록
+    cmds:
+      - task --list
+    silent: true
+
+  install:
+    desc: 의존성 설치
+    cmds:
+      - pnpm install
+
+  # 개발 서버 (api :3000, web :5173 — web은 /api를 api로 프록시)
+  dev:
+    desc: api와 web 개발 서버를 함께 실행
+    deps: [dev:api, dev:web]
+
+  dev:api:
+    desc: api 개발 서버 (tsx watch, :3000)
+    cmds:
+      - pnpm --filter @muse-pen/api dev
+
+  dev:web:
+    desc: web 개발 서버 (Vite, :5173)
+    cmds:
+      - pnpm --filter @muse-pen/web dev
+
+  start:api:
+    desc: api 서버 실행 (watch 없음)
+    cmds:
+      - pnpm --filter @muse-pen/api start
+
+  # 시드 (DB_PATH 환경 변수로 DB 지정, 기본 apps/api/data/muse-pen.db)
+  seed:admin:
+    desc: '관리자 생성 — 예: task seed:admin -- --email a@b.com --password <8자 이상>'
+    cmds:
+      - pnpm --filter @muse-pen/api run seed -- admin {{.CLI_ARGS}}
+
+  seed:invite:
+    desc: '초대 코드 생성 — 예: task seed:invite -- --count 3'
+    cmds:
+      - pnpm --filter @muse-pen/api run seed -- invite {{.CLI_ARGS}}
+
+  # 검증 (CI와 같은 순서)
+  typecheck:
+    desc: 전체 타입 검사
+    cmds:
+      - pnpm -r typecheck
+
+  build:
+    desc: 전체 빌드 (tests 제외)
+    cmds:
+      - pnpm -r --filter "!./tests" build
+
+  test:
+    desc: 단위 테스트 (tests 제외)
+    cmds:
+      - pnpm -r --filter "!./tests" test
+
+  check:
+    desc: CI와 동일한 검증 (typecheck → build → test)
+    cmds:
+      - task: typecheck
+      - task: build
+      - task: test
+
+  test:accept:
+    desc: 인수 테스트 (vitest + Playwright E2E, 포트 3000·5173 사용)
+    cmds:
+      - pnpm --filter @muse-pen/tests test:accept
+
+  e2e:install:
+    desc: Playwright chromium 설치
+    cmds:
+      - pnpm --filter @muse-pen/tests exec playwright install chromium
+
+  # Docker 단일 VPS 런타임 (infra/README.md). ENV_FILE은 저장소 밖 경로로 지정한다.
+  compose:config:
+    desc: 'compose 설정 검증 — 예: task compose:config ENV_FILE=/tmp/muse-pen.env'
+    requires:
+      vars: [ENV_FILE]
+    cmds:
+      - 'docker compose --env-file {{.ENV_FILE}} -f infra/docker-compose.yml config -q'
+
+  compose:up:
+    desc: 스택 빌드 후 백그라운드 실행
+    requires:
+      vars: [ENV_FILE]
+    cmds:
+      - 'docker compose --env-file {{.ENV_FILE}} -f infra/docker-compose.yml up --build -d'
+
+  compose:down:
+    desc: 스택 중지 (볼륨 데이터는 유지)
+    requires:
+      vars: [ENV_FILE]
+    cmds:
+      - 'docker compose --env-file {{.ENV_FILE}} -f infra/docker-compose.yml down'
+
+  compose:logs:
+    desc: '서비스 로그 — 예: task compose:logs ENV_FILE=... -- api'
+    requires:
+      vars: [ENV_FILE]
+    cmds:
+      - 'docker compose --env-file {{.ENV_FILE}} -f infra/docker-compose.yml logs -f {{.CLI_ARGS}}'
