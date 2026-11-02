@@ -1,0 +1,36 @@
+:root {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  line-height: 1.6;
+  color: #1f2328;
+  background: #fafaf8;
+}
+body { margin: 0; }
+.spike { max-width: 1280px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+.spike h1 { font-size: 20px; margin: 0; }
+.spike .hint { color: #6b7280; font-size: 14px; margin: 4px 0 0; }
+.spike-editors { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.spike-pane { background: #fff; border: 1px solid #e4e4e0; border-radius: 8px; padding: 12px; min-width: 0; }
+.spike-pane h2 { font-size: 15px; margin: 0 0 8px; }
+.spike-editor { min-height: 220px; }
+
+/* ghost text: 조합 중에는 DOM을 지우지 않고 CSS로만 숨긴다. */
+.ghost-text { color: #9aa0a6; pointer-events: none; user-select: none; }
+[data-composing='true'] .ghost-text { display: none; }
+
+/* Plate는 기본 스타일이 없어 최소한만 둔다. */
+.plate-editor { outline: none; min-height: 200px; padding: 4px 8px; }
+.plate-editor p { margin: 0 0 8px; }
+.plate-slash-input { background: #eef1f6; border-radius: 4px; padding: 0 2px; }
+.plate-slash-input input { border: 0; padding: 0; background: transparent; outline: none; font: inherit; width: 100%; }
+.plate-slash-menu { z-index: 50; min-width: 200px; max-height: 260px; overflow: auto; background: #fff; border: 1px solid #c9ccd1; border-radius: 6px; padding: 4px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12); }
+.plate-slash-item { padding: 6px 10px; border-radius: 4px; cursor: pointer; }
+.plate-slash-item[data-active-item] { background: #e8ecf3; }
+
+.spike-log { background: #fff; border: 1px solid #e4e4e0; border-radius: 8px; padding: 12px; }
+.spike-log header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.spike-log h2 { font-size: 15px; margin: 0; }
+.spike-log button { padding: 4px 10px; font: inherit; font-size: 13px; border: 1px solid #c9ccd1; border-radius: 6px; background: #fff; cursor: pointer; }
+.spike-log ol { list-style: none; margin: 0; padding: 0; max-height: 320px; overflow: auto; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.spike-log li { white-space: pre-wrap; border-bottom: 1px solid #f0f0ec; }
+.spike-log .tag-blocknote { color: #1a56db; }
+.spike-log .tag-plate { color: #b42318; }

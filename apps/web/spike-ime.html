@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>muse-pen 에디터 IME 스파이크</title>
+    <!-- dev 전용 시험 진입점이다. vite.config.ts의 build input에 넣지 않아 운영 빌드에 포함되지 않는다. -->
+    <!-- Pretendard 정적 빌드(CDN). index.html과 같은 링크를 써서 폰트 조건을 맞춘다. -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/spike-ime/main.tsx"></script>
+  </body>
+</html>
