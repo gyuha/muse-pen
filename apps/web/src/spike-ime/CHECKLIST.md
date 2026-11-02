@@ -27,7 +27,13 @@ BlockNote와 Plate를 같은 조건에서 시험해 에디터 라이브러리를
 - 둘 다 통과 → Plate를 채택한다.
 - 둘 다 실패 → Lexical을 검토한다.
 - 판정은 **조합 중 Enter, 조합 중 Backspace, 조합 중 클릭, "/" 메뉴 한글 입력** 네 항목을 중심으로 한다. ghost text 칸은 참고로 쓴다(BlockNote는 직접 구현이라 시험 코드의 결함일 수 있다).
+- Plate의 "/" 실패 시 이벤트 로그로 라이브러리(Slate/ariakit) 문제인지 시험 코드 문제인지 먼저 가린 뒤 판정한다. Plate의 "/" 메뉴는 공식 slash-node UI가 아니라 그 구조를 줄여 직접 쓴 `PlateSlashMenu.tsx`다.
 - 이번 판정은 macOS 4행으로 한다. Windows 3행은 미시험으로 두고, 나중에 같은 저장소를 받아 이어서 채운다.
+
+## 시험 조건
+
+- 두 에디터 모두 입력을 1초 멈추면 고정 가짜 문자열이 ghost text로 뜬다. AI 호출은 없다.
+- Plate Copilot은 기본 `autoTriggerQuery`(블록이 공백으로 끝날 때만 동작)를 바꿔, 블록에 글자가 있고 제안이 없으면 뜨게 했다. 시험을 쉽게 하려는 변경이라 기본 동작과 다르다.
 
 ## 시험 버전 기록
 
@@ -68,13 +74,13 @@ BlockNote와 Plate를 같은 조건에서 시험해 에디터 라이브러리를
 
 | 환경 | 조합 중 Enter | 조합 중 Backspace | 조합 중 클릭 | "/" 메뉴 한글 입력 | ghost text |
 |---|---|---|---|---|---|
-| macOS Chrome |  |  |  |  |  |
-| macOS Safari |  |  |  |  |  |
-| macOS Firefox |  |  |  |  |  |
-| macOS Edge |  |  |  |  |  |
-| Windows Chrome | 미시험 | 미시험 | 미시험 | 미시험 | 미시험 |
-| Windows Firefox | 미시험 | 미시험 | 미시험 | 미시험 | 미시험 |
-| Windows Edge | 미시험 | 미시험 | 미시험 | 미시험 | 미시험 |
+| macOS Chrome |  |  |  | (직접 구현 결함 가능) |  |
+| macOS Safari |  |  |  | (직접 구현 결함 가능) |  |
+| macOS Firefox |  |  |  | (직접 구현 결함 가능) |  |
+| macOS Edge |  |  |  | (직접 구현 결함 가능) |  |
+| Windows Chrome | 미시험 | 미시험 | 미시험 | 미시험 (직접 구현 결함 가능) | 미시험 |
+| Windows Firefox | 미시험 | 미시험 | 미시험 | 미시험 (직접 구현 결함 가능) | 미시험 |
+| Windows Edge | 미시험 | 미시험 | 미시험 | 미시험 (직접 구현 결함 가능) | 미시험 |
 
 ## 메모
 
