@@ -10,12 +10,24 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
+    "@ai-sdk/react": "4.0.163",
+    "@blocknote/core": "0.57.0",
+    "@blocknote/mantine": "0.57.0",
+    "@blocknote/react": "0.57.0",
+    "@mantine/core": "9.0.2",
+    "@mantine/hooks": "9.0.2",
     "@muse-pen/api": "workspace:*",
     "@muse-pen/shared": "workspace:*",
+    "@platejs/ai": "53.3.18",
+    "@platejs/basic-nodes": "53.0.0",
+    "@platejs/slash-command": "53.0.0",
+    "ai": "7.0.159",
     "hono": "^4.13.16",
+    "platejs": "53.5.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-router": "^8.5.1"
+    "react-router": "^8.5.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.2",
