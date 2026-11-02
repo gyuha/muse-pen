@@ -1,5 +1,6 @@
 :root {
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  --spike-font: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  font-family: var(--spike-font);
   line-height: 1.6;
   color: #1f2328;
   background: #fafaf8;
@@ -40,3 +41,6 @@ body { margin: 0; }
 .spike-pane header label { display: flex; flex-direction: row; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; }
 .spike-pane header input { padding: 0; }
 .render-count { display: block; text-align: right; color: #6b7280; font: 12px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin-top: 4px; }
+
+/* BlockNote 기본 스타일의 Inter 지정이 Pretendard를 덮어쓰지 않게 해 두 후보의 폰트 조건을 맞춘다. */
+.spike-editor .bn-container, .spike-editor .bn-default-styles { font-family: var(--spike-font); }
