@@ -1,0 +1,21 @@
+:root {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  line-height: 1.5;
+  color: #1f2328;
+  background: #fafaf8;
+}
+body { margin: 0; }
+.app { max-width: 880px; margin: 0 auto; padding: 24px 16px 64px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.topbar a { color: inherit; text-decoration: none; font-weight: 700; }
+form { display: grid; gap: 12px; max-width: 480px; }
+label { display: grid; gap: 4px; font-size: 14px; font-weight: 600; }
+input, select, textarea, button { font: inherit; padding: 8px 10px; border: 1px solid #c9ccd1; border-radius: 6px; }
+button { cursor: pointer; background: #1f2328; color: #fff; border-color: #1f2328; }
+button.secondary { background: #fff; color: #1f2328; }
+.error { color: #b42318; font-size: 14px; }
+.card-list { list-style: none; padding: 0; display: grid; gap: 8px; }
+.card-list li { padding: 12px 14px; background: #fff; border: 1px solid #e4e4e0; border-radius: 8px; }
+.tabs { display: flex; gap: 8px; margin: 12px 0; }
+.tabs button[aria-selected='false'] { background: #fff; color: #1f2328; }
+.muted { color: #6b7280; font-size: 14px; }

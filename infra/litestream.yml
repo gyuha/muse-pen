@@ -1,0 +1,9 @@
+dbs:
+  - path: /data/sqlite/muse-pen.db
+    replicas:
+      - type: s3
+        bucket: ${S3_BUCKET}
+        path: sqlite/muse-pen
+        endpoint: ${S3_ENDPOINT}
+        region: ${S3_REGION}
+        force-path-style: true
