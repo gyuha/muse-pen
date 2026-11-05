@@ -27,6 +27,11 @@
 5. `7장 이상` 0 / `gemini-3-pro-image` 0 → 각각 1
 6. UAT — 미실행. `GEMINI_API_KEY`와 `spike/inputs/` 이미지가 아직 없다
 
+## 저장소 복구 (2026-11-05)
+- 2026-11-03 15:33 무렵 `.git`이 원인 불명으로 사라져 푸시 전 커밋 6개(`9b8d5f5` `0c6e126` `6ee6b3e` `4d8329c` `134228e` `1d8761a`)를 잃었다. 작업 트리는 남아 있었다.
+- 원격(`https://github.com/gyuha/muse-pen`, `main`=`7527187`)에서 `.git`만 다시 받아 붙이고 같은 내용을 다시 커밋했다: `300b204`(docs/05), `c11776e`(image-engine 전체), forge 기록 커밋. 위 슬라이스별 해시는 옛 해시다.
+- 복구 후 재확인: 테스트 14개 통과, `pnpm -r typecheck` 통과, check-ignore 두 경로 출력.
+
 ## 후속 작업 후보
 
 <!-- followup: fu-22453050be48 | source: image-consistency-censorship-spike | task: 10 | date: 2026-11-03 | status: open | taken: - -->
