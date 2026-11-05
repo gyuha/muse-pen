@@ -37,6 +37,7 @@ export interface GenerateImageRequest {
   /** Only approved reference records, resolved by the backend within the work. */
   referenceRecords: readonly ImageRecord[];
   quality: ImageQuality;
+  direction?: string;
   imageId: string;
   storageKey: string;
   createdAt: string;
@@ -55,7 +56,8 @@ export interface GeneratedImage {
 
 export async function generateImage(request: GenerateImageRequest, deps: ImageEngineDependencies): Promise<GeneratedImage> {
   const { setting } = request;
-  const prompt = buildImagePrompt(setting, request.artStyle); // rejects world before any IO
+  const basePrompt = buildImagePrompt(setting, request.artStyle); // rejects world before any IO
+  const prompt = request.direction === undefined ? basePrompt : `${basePrompt}\n${request.direction}`;
   if (setting.kind === 'world') throw new Error('World settings do not support image generation');
   const style = artStylePresetSchema.parse(request.artStyle);
   if (request.quality !== 'draft' && request.quality !== 'final') throw new Error('Invalid image quality');
@@ -85,3 +87,4 @@ export async function generateImage(request: GenerateImageRequest, deps: ImageEn
 }
 
 export { FakeImageProvider } from './providers/fake';
+export { GeminiImageProvider, ImageSafetyBlockedError, ImageNoImageError } from './providers/gemini';

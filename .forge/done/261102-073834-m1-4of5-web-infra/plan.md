@@ -1,6 +1,6 @@
 <!-- forge-slug: m1-4of5-web-infra -->
 <!-- repaired-by: fg-loop -->
-<!-- task: 7 -->
+<!-- task: 14 -->
 <!-- part: 4/5 -->
 <!-- tdd: off -->
 # M1 4/5 — apps/web 기본 화면과 배포 파일

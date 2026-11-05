@@ -11,14 +11,17 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "build": "tsc -p tsconfig.build.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "spike": "node --env-file-if-exists=../../.env --import tsx spike/run.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "tsx": "4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.5"
   },
   "dependencies": {
+    "@google/genai": "2.32.0",
     "@muse-pen/shared": "workspace:*"
   }
 }

@@ -1,5 +1,5 @@
 <!-- forge-slug: m1-5of5-acceptance -->
-<!-- task: 8 -->
+<!-- task: 15 -->
 <!-- part: 5/5 -->
 <!-- tdd: off -->
 # M1 5/5 — qa 수락 테스트(AC-01~AC-16)

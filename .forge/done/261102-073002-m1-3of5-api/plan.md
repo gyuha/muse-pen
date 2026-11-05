@@ -1,5 +1,5 @@
 <!-- forge-slug: m1-3of5-api -->
-<!-- task: 6 -->
+<!-- task: 13 -->
 <!-- part: 3/5 -->
 <!-- tdd: off -->
 # M1 3/5 — apps/api: 인증·CRUD·작업 테이블·SSE·이미지·사용 기록
