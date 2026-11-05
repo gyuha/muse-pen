@@ -19,3 +19,9 @@
 3. `pnpm -r typecheck` 통과 → 통과(회귀 방지, 기준값부터 통과)
 4. `grep -c TEXT_PROVIDER apps/api/src/server.ts` 0 → 1
 5. UAT(실제 구독 호출): `TEXT_PROVIDER=claude-code`로 로컬 api(:3999, 임시 DB)를 띄워 초대 → 가입 → 로그인 → 작품·회차 생성 → 이어쓰기 SSE를 호출했다. 결과는 token 이벤트 198개 → suggestion → done, 약 9초, 한국어 본문 정상, AI 사용 기록 1건(`text_generation`, `claude-sonnet-5-5`, 입력 1,657·출력 737토큰). 입력 크기로 보아 전역 CLAUDE.md는 들어가지 않았고, 출력에도 페르소나 흔적이 없다.
+
+## 후속 작업 후보
+
+<!-- followup: fu-846d69fd39f6 | source: dev-claude-code-text-provider | task: 17 | date: 2026-11-05 | status: open | taken: - -->
+- 가입 직후 세션 확인: 초대 코드 가입(200) 직후 쿠키로 작품 생성이 401이고, 다시 로그인하면 정상이다. 가입 후 자동 로그인이 꺼진 의도된 설계인지 확인하고, 아니라면 고친다(backend, 인증).
+  Evidence: 2026-11-05 UAT 스크립트에서 재현(가입 200 → POST /api/works 401 → 로그인 200 → 정상).
