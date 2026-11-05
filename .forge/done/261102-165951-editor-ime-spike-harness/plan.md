@@ -1,5 +1,5 @@
 <!-- forge-slug: editor-ime-spike-harness -->
-<!-- task: 9 -->
+<!-- task: 16 -->
 <!-- priority: high -->
 <!-- tdd: off -->
 # 에디터 한국어 IME 스파이크 — 시험 페이지와 체크리스트 구축
