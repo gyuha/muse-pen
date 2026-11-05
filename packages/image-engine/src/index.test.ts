@@ -87,3 +87,15 @@ describe('image engine', () => {
     expect(first.data).not.toEqual((await provider.generate({ ...input, referenceImages: [{ contentType: 'image/png', data: new Uint8Array([1]) }] })).data);
   });
 });
+
+it('direction appends a separate line after the unchanged base prompt', async () => {
+  const f = fixture();
+  const result = await generateImage({ ...f.request, direction: '정면 미소' }, f);
+  expect(result.prompt).toBe(`${buildImagePrompt(setting, style)}\n정면 미소`);
+  expect(f.generate.mock.calls[0]![0].prompt).toBe(result.prompt);
+});
+it('without direction preserves the existing prompt byte for byte', async () => {
+  const f = fixture();
+  const result = await generateImage(f.request, f);
+  expect(Buffer.from(result.prompt)).toEqual(Buffer.from(buildImagePrompt(setting, style)));
+});

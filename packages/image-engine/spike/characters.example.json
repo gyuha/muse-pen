@@ -1,0 +1,6 @@
+{
+  "style": { "prompt": "애니메이션풍 웹소설 삽화, 선명한 선화", "references": ["style.png"] },
+  "characters": [
+    { "id": "harin", "name": "하린", "gender": "여성", "ageGroup": "성인", "appearanceKeywords": ["흑발", "푸른 눈", "장신", "흰 코트"], "representative": "harin.png" }
+  ]
+}
